@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Memorama</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.2.1/dist/sweetalert2.all.min.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <h3>Memorama</h3>
+        <p>Adivina la pareja!!</p>
+        
+    </header>
+    <div class="contenedor-vidas">
+        <span>Vidas:</span>
+        <img src="img/corazon.png">
+        <img src="img/corazon.png">
+        <img src="img/corazon.png">
+        <img src="img/corazon.png">
+        <img src="img/corazon.png">
+        <img src="img/corazon.png">
+
+    </div>
+    <style>
+
+        h3{
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 400%;
+            -webkit-text-stroke: 2px white;
+            color: red;
+        }
+
+        p{
+            font-size: 200%;
+            color: white;
+        }
+
+
+        :root {
+            --w: calc(70vw / 6);
+            --h: calc(70vh / 3);
+        }
+
+        * {
+            transition: all 0.5s;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background-image: url("https://media.istockphoto.com/vectors/digital-technology-gaming-abstract-background-vector-id1164222265?k=20&m=1164222265&s=170667a&w=0&h=IVofCowQw51bHMHrh7FYP6K8TWUu2opeZN6iQ3HmGPg=");
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: calibri;
+        }
+
+        div {
+            display: inline-block;
+        }
+
+        .area-tarjeta,
+        .tarjeta,
+        .cara {
+            cursor: pointer;
+            width: var(--w);
+            min-width: 100px;
+            height: var(--h);
+        }
+
+        .tarjeta {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: iniciar 3s;
+        }
+
+        .cara {
+            position: absolute;
+            backface-visibility: hidden;
+            box-shadow: inset 0 0 0 5px white;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .trasera {
+            background-color: lightcyan;
+            transform: rotateY(180deg);
+        }
+
+        .superior {
+            background: linear-gradient(orange, darkorange);
+        }
+
+        .nuevo-juego {
+            cursor: pointer;
+            background: linear-gradient(orange, darkorange);
+            padding: 20px;
+            border-radius: 50px;
+            border: white 5px solid;
+            font-size: 130%;
+        }
+
+        img{
+            width: 100%;
+        }
+
+        .contenedor-vidas span{
+            font-size: 200%;
+            color: white;
+        }
+
+        .contenedor-vidas img{
+            width: 40px;
+            margin: 5px;
+        }
+
+        @keyframes iniciar {
+
+            20%,
+            90% {
+                transform: rotateY(180deg);
+            }
+
+            0%,
+            100% {
+                transform: rotateY(0deg);
+            }
+        }
+    </style>
+
+    <div id="tablero">
+    </div>
+
+    <br>
+
+    <div class="nuevo-juego" onclick="location.reload();">
+        Nuevo Juego
+    </div>
+
+    <script>
+
+        let cantidad_vidas = 6
+        let cantidadTarjetas = 18
+
+        let iconos = []
+        let selecciones = []
+
+        generarTablero()
+
+        function cargarIconos() {
+            iconos = [
+                '<img src="img/imagen1.jpg">',
+                '<img src="img/imagen2.jpg">',
+                '<img src="img/imagen3.jpg">',
+                '<img src="img/imagen4.jpg">',
+                '<img src="img/imagen5.jpg">',
+                '<img src="img/imagen6.jpg">',
+                '<img src="img/imagen7.jpg">',
+                '<img src="img/imagen8.jpg">',
+                '<img src="img/imagen9.jpg">',
+            ]
+        }
+
+        function generarTablero() {
+            cargarIconos()
+            selecciones = []
+            let tablero = document.getElementById("tablero")
+            let tarjetas = []
+            for (let i = 0; i < cantidadTarjetas; i++) {
+                tarjetas.push(`
+                <div class="area-tarjeta" onclick="seleccionarTarjeta(${i})">
+                    <div class="tarjeta" id="tarjeta${i}">
+                        <div class="cara trasera" id="trasera${i}">
+                            ${iconos[0]}
+                        </div>
+                        <div class="cara superior">
+                        </div>
+                    </div>
+                </div>        
+                `)
+                if (i % 2 == 1) {
+                    iconos.splice(0, 1)
+                }
+            }
+            tarjetas.sort(() => Math.random() - 0.5)
+            tablero.innerHTML = tarjetas.join(" ")
+            
+        }
+
+        function seleccionarTarjeta(i) {
+            let tarjeta = document.getElementById("tarjeta" + i)
+            if (tarjeta.style.transform != "rotateY(180deg)") {
+                tarjeta.style.transform = "rotateY(180deg)"
+                selecciones.push(i)
+                
+            }
+            if (selecciones.length == 2) {
+                deseleccionar(selecciones)
+                selecciones = []
+                
+            }
+        }
+
+        function deseleccionar(selecciones) {
+            setTimeout(() => {
+                let trasera1 = document.getElementById("trasera" + selecciones[0])
+                let trasera2 = document.getElementById("trasera" + selecciones[1])
+                if (trasera1.innerHTML != trasera2.innerHTML) {
+                    let tarjeta1 = document.getElementById("tarjeta" + selecciones[0])
+                    let tarjeta2 = document.getElementById("tarjeta" + selecciones[1])
+                    tarjeta1.style.transform = "rotateY(0deg)"
+                    tarjeta2.style.transform = "rotateY(0deg)"                    
+                    quitarvidas();
+                    
+                }else{
+                    trasera1.style.background = "plum"
+                    trasera2.style.background = "plum"
+                    
+                }
+                if (verificarFin()) {
+                    swal.fire({
+                        title: `El juego ha finalizado`,
+                        text: `Felicitaciones`,
+                        icon: `success`
+                    })
+                }
+            }, 1000);
+            
+        }
+
+        function verificarFin() {
+            for (let i = 0; i < cantidadTarjetas; i++) {
+                let trasera = document.getElementById("trasera" + i)
+                if (trasera.style.background != "plum") {
+                    return false
+                }
+            }
+            return true
+        };
+
+        function quitarvidas(){
+            try {
+                if(cantidad_vidas == 1 ){
+                    alert("Perdiste!!");
+                    generarTablero();
+                    location.reload();
+                    
+                }
+                document.querySelector(".contenedor-vidas").querySelectorAll("img")[0].remove();
+                --cantidad_vidas;
+            }
+            catch(error) {
+                console.log(error);
+            }
+                
+        };
+        
+        
+    </script>
+
+</body>
+
+</html>
